@@ -1,0 +1,125 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--grad-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.email {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.role {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Sección de Huellas */
+.passkeyList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.passkeyItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+.passkeyInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.passkeyIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--text-accent);
+}
+
+.passkeyName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.passkeyDate {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.deleteBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-danger);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteBtn:hover {
+  background: rgba(255, 71, 87, 0.1);
+}
+
+.deleteIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.emptyState {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Info Box */
+.infoBox {
+  background: rgba(67, 100, 247, 0.05);
+  border: 1px solid rgba(67, 100, 247, 0.15);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 13px;
+  color: #b0c4ff;
+  line-height: 1.5;
+  margin-top: 10px;
+}

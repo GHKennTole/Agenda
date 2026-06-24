@@ -1,0 +1,118 @@
+.navBar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 600px;
+  height: var(--nav-height);
+  background: rgba(15, 18, 28, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 10px;
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  transition: all 0.2s;
+  flex: 1;
+  height: 100%;
+}
+
+.navItemActive {
+  color: var(--text-accent);
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  margin-bottom: 4px;
+  transition: transform 0.2s;
+}
+
+.navItem:hover .icon {
+  transform: translateY(-2px);
+}
+
+.navItemActive .icon {
+  transform: translateY(-2px);
+}
+
+/* Botón flotante del Asistente de Voz */
+.micContainer {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  margin-top: -36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 101;
+}
+
+.micBtn {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--grad-primary);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(67, 100, 247, 0.4),
+              0 0 0 0px rgba(67, 100, 247, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.micBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 10px 25px rgba(67, 100, 247, 0.5),
+              0 0 0 6px rgba(67, 100, 247, 0.1);
+}
+
+.micBtn:active {
+  transform: scale(0.95);
+}
+
+.micBtnListening {
+  background: linear-gradient(135deg, var(--color-danger) 0%, #ff7979 100%);
+  box-shadow: 0 8px 20px rgba(255, 71, 87, 0.4);
+  animation: pulseListening 1.5s infinite;
+}
+
+.micIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--text-primary);
+}
+
+/* Efecto de pulso al escuchar */
+@keyframes pulseListening {
+  0% {
+    box-shadow: 0 0 0 0px rgba(255, 71, 87, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(255, 71, 87, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0px rgba(255, 71, 87, 0);
+  }
+}
