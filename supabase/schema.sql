@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS public.todos (
 -- Habilitar Row Level Security (RLS) para todos
 ALTER TABLE public.todos ENABLE ROW LEVEL SECURITY;
 
+-- Eliminar la política si ya existe para evitar errores al re-ejecutar
+DROP POLICY IF EXISTS "Permitir todos los accesos a los usuarios sobre sus propias tareas" ON public.todos;
+
 -- Crear políticas de seguridad para todos
 CREATE POLICY "Permitir todos los accesos a los usuarios sobre sus propias tareas"
     ON public.todos
@@ -39,6 +42,9 @@ CREATE TABLE IF NOT EXISTS public.notes (
 -- Habilitar RLS para notes
 ALTER TABLE public.notes ENABLE ROW LEVEL SECURITY;
 
+-- Eliminar la política si ya existe para evitar errores al re-ejecutar
+DROP POLICY IF EXISTS "Permitir todos los accesos a los usuarios sobre sus propias notas" ON public.notes;
+
 -- Crear políticas de seguridad para notes
 CREATE POLICY "Permitir todos los accesos a los usuarios sobre sus propias notas"
     ON public.notes
@@ -55,6 +61,9 @@ BEGIN
     RETURN NEW;
 END;
 $$ language 'plpgsql';
+
+-- Eliminar el trigger si ya existe para evitar errores al re-ejecutar
+DROP TRIGGER IF EXISTS update_notes_updated_at ON public.notes;
 
 -- Trigger para actualizar el campo updated_at en notes
 CREATE TRIGGER update_notes_updated_at

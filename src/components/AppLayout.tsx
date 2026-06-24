@@ -13,9 +13,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const isLoginPage = pathname === '/login';
 
-  // Registrar Service Worker para soporte PWA
+  // Registrar Service Worker para soporte PWA (Solo en producción para evitar bucles de reinicio con HMR)
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       navigator.serviceWorker.register('/sw.js')
         .then((reg) => {
           console.log('Service Worker registrado con éxito. Ámbito:', reg.scope);

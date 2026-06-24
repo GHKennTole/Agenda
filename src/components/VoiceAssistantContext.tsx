@@ -42,6 +42,7 @@ export function VoiceAssistantProvider({ children }: { children: React.ReactNode
   // Referencia al objeto de reconocimiento de voz
   const recognitionRef = useRef<any>(null);
   const isSelfStopped = useRef(false);
+  const transcriptRef = useRef('');
 
   useEffect(() => {
     // Inicializar Web Speech API
@@ -56,6 +57,7 @@ export function VoiceAssistantProvider({ children }: { children: React.ReactNode
       rec.onstart = () => {
         setIsListening(true);
         setTranscript('');
+        transcriptRef.current = '';
         setError(null);
         isSelfStopped.current = false;
       };
@@ -72,7 +74,9 @@ export function VoiceAssistantProvider({ children }: { children: React.ReactNode
           }
         }
 
-        setTranscript(finalTranscript || interimTranscript);
+        const currentText = finalTranscript || interimTranscript;
+        setTranscript(currentText);
+        transcriptRef.current = currentText;
       };
 
       rec.onerror = (event: any) => {
@@ -89,13 +93,10 @@ export function VoiceAssistantProvider({ children }: { children: React.ReactNode
         setIsListening(false);
         // Si no se detuvo manualmente por cancelación, procesamos el resultado
         if (!isSelfStopped.current) {
-          // Usamos el transcript actual
-          setTranscript((prev) => {
-            if (prev && prev.trim().length > 0) {
-              processVoiceText(prev.trim());
-            }
-            return prev;
-          });
+          const finalOutput = transcriptRef.current.trim();
+          if (finalOutput.length > 0) {
+            processVoiceText(finalOutput);
+          }
         }
       };
 
@@ -148,7 +149,8 @@ export function VoiceAssistantProvider({ children }: { children: React.ReactNode
 
       if (!response.ok) {
         const errData = await response.json();
-        throw new Error(errData.error || 'Error al procesar la nota de voz.');
+        setError(errData.error || 'Error al procesar la nota de voz.');
+        return;
       }
 
       const result = await response.json();

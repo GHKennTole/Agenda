@@ -75,40 +75,93 @@ Texto dictado por el usuario:
       return NextResponse.json({ error: 'Clave de API de Gemini no configurada' }, { status: 500 });
     }
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-    const geminiResponse = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
+    let geminiResponse: Response | null = null;
+    const maxAttempts = 3;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        geminiResponse = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
               {
-                text: systemPrompt
+                parts: [
+                  {
+                    text: systemPrompt
+                  }
+                ]
               }
-            ]
-          }
-        ],
-        generationConfig: {
-          responseMimeType: 'application/json' // Forzar respuesta JSON nativa si el modelo la soporta
+            ],
+            generationConfig: {
+              responseMimeType: 'application/json'
+            }
+          })
+        });
+
+        // Si la respuesta es exitosa, o es un error que no sea 503, salimos del bucle
+        // Si es 429 (cuota excedida), no tiene sentido reintentar de inmediato, salimos.
+        if (geminiResponse.ok || geminiResponse.status !== 503) {
+          break;
         }
-      })
-    });
+
+        console.warn(`Intento ${attempt} de ${maxAttempts} falló con 503 (Servicio Ocupado). Reintentando...`);
+      } catch (fetchErr) {
+        console.error(`Error de red en intento ${attempt}:`, fetchErr);
+        if (attempt === maxAttempts) throw fetchErr;
+      }
+
+      // Espera exponencial corta si vamos a reintentar
+      if (attempt < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, 800 * attempt));
+      }
+    }
+
+    if (!geminiResponse) {
+      return NextResponse.json({ error: 'No se recibió respuesta de la IA.' }, { status: 500 });
+    }
 
     if (!geminiResponse.ok) {
       const errorText = await geminiResponse.text();
       console.error('Error de la API de Gemini:', errorText);
-      throw new Error('Fallo al comunicarse con el servicio de IA.');
+      
+      try {
+        const errJson = JSON.parse(errorText);
+        const code = errJson.error?.code;
+        const msg = errJson.error?.message;
+        
+        if (code === 429) {
+          return NextResponse.json(
+            { error: 'Has agotado tu cuota de solicitudes gratuitas de Gemini. Por favor, espera un minuto o revisa los límites en tu panel de Google AI Studio.' },
+            { status: 429 }
+          );
+        }
+        
+        if (code === 503) {
+          return NextResponse.json(
+            { error: 'La IA de Google está experimentando una alta demanda en este momento. Por favor, vuelve a tocar el micrófono en unos segundos.' },
+            { status: 503 }
+          );
+        }
+        
+        return NextResponse.json(
+          { error: msg || 'Fallo en la comunicación con el servicio de IA.' },
+          { status: geminiResponse.status }
+        );
+      } catch {
+        return NextResponse.json({ error: 'Fallo al comunicarse con el servicio de IA.' }, { status: 500 });
+      }
     }
 
     const geminiData = await geminiResponse.json();
     const candidateText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!candidateText) {
-      throw new Error('La IA no devolvió ninguna respuesta válida.');
+      return NextResponse.json({ error: 'La IA no devolvió ninguna respuesta válida.' }, { status: 502 });
     }
 
     // 6. Parsear el JSON devuelto por Gemini
